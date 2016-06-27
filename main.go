@@ -110,14 +110,24 @@ func newCopyFileFun(srcBase string, destBase string) filepath.WalkFunc {
 
 func export(src string, dest string) error {
 	copyFile := newCopyFileFun(src, dest)
-	filepath.Walk(src, copyFile)
-	return nil
+	err := filepath.Walk(src, copyFile)
+	return err
+}
+
+func paths() (string, string, error) {
+	cur, err := os.Getwd()
+	if err != nil {
+		return "", "", err
+	}
+
+	dirty := filepath.Join(cur, cormDir)
+	return cur, dirty, err
 }
 
 func mainCmd() int {
-	curdir, err := os.Getwd()
+	curdir, dirtyVendorDir, err := paths()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "cannot get current directory")
+		fmt.Fprintln(os.Stderr, "cannot get directory")
 		return 1
 	}
 
@@ -138,7 +148,6 @@ func mainCmd() int {
 		return 1
 	}
 
-	dirtyVendorDir := filepath.Join(curdir, cormDir)
 	gopath := os.Getenv("GOPATH")
 	os.Setenv("GOPATH", fmt.Sprintf("%s:%s", dirtyVendorDir, gopath))
 
@@ -149,11 +158,22 @@ func mainCmd() int {
 		}
 	}
 
-	/*
-		dirtyVendorSrcDir := filepath.Join(dirtyVendorDir, "src")
-		cleanVendorDir := filepath.Join(curdir, "vendor")
-		export(dirtyVendorSrcDir, cleanVendorDir)
-	*/
+	return 0
+}
+
+func exportCmd() int {
+	curdir, dirtyVendorDir, err := paths()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "cannot get directory")
+		return 1
+	}
+
+	dirtyVendorSrcDir := filepath.Join(dirtyVendorDir, "src")
+	cleanVendorDir := filepath.Join(curdir, "vendor")
+	err = export(dirtyVendorSrcDir, cleanVendorDir)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "export error:", err)
+	}
 
 	return 0
 }
