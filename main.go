@@ -178,7 +178,29 @@ func exportCmd() int {
 	return 0
 }
 
+func usage() int {
+	fmt.Println(`Usage: corm command
+	install	:	install packages from Cormfile.
+	export	:	export packages to vendor directory.`)
+
+	return 1
+}
+
 func main() {
 	sort.Strings(vcsMetaDir)
-	os.Exit(mainCmd())
+
+	if len(os.Args) == 1 {
+		os.Exit(usage())
+	}
+
+	command := os.Args[1]
+
+	switch command {
+	case "install":
+		os.Exit(mainCmd())
+	case "export":
+		os.Exit(exportCmd())
+	default:
+		os.Exit(usage())
+	}
 }
