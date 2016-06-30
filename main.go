@@ -16,6 +16,11 @@ const (
 	cormDir      = "_corm"
 )
 
+var (
+	currentDir     string
+	dirtyVendorDir string
+)
+
 var errCannotParseLine = errors.New("cannot parse line")
 
 var vcsMetaDir = []string{".svn", ".git", ".hg"}
@@ -114,24 +119,26 @@ func export(src string, dest string) error {
 	return err
 }
 
-func paths() (string, string, error) {
-	cur, err := os.Getwd()
+func init() {
+	var err error
+	currentDir, err = os.Getwd()
 	if err != nil {
-		return "", "", err
+		fmt.Fprintln(os.Stderr, "cannot get current directory")
+		os.Exit(1)
 	}
 
-	dirty := filepath.Join(cur, cormDir)
-	return cur, dirty, err
+	dirtyVendorDir = filepath.Join(currentDir, cormDir)
+}
+
+func fakeGopath() {
+
+	gopath := os.Getenv("GOPATH")
+	os.Setenv("GOPATH", fmt.Sprintf("%s:%s", dirtyVendorDir, gopath))
+
 }
 
 func mainCmd() int {
-	curdir, dirtyVendorDir, err := paths()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "cannot get directory")
-		return 1
-	}
-
-	cormfile := filepath.Join(curdir, cormFilename)
+	cormfile := filepath.Join(currentDir, cormFilename)
 	if !exists(cormfile) {
 		fmt.Fprintf(os.Stderr, "%s does not exists\n", cormfile)
 		return 1
@@ -148,9 +155,7 @@ func mainCmd() int {
 		return 1
 	}
 
-	gopath := os.Getenv("GOPATH")
-	os.Setenv("GOPATH", fmt.Sprintf("%s:%s", dirtyVendorDir, gopath))
-
+	fakeGopath()
 	for _, repo := range repos {
 		err := goGet(repo)
 		if err != nil {
@@ -162,15 +167,9 @@ func mainCmd() int {
 }
 
 func exportCmd() int {
-	curdir, dirtyVendorDir, err := paths()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "cannot get directory")
-		return 1
-	}
-
 	dirtyVendorSrcDir := filepath.Join(dirtyVendorDir, "src")
-	cleanVendorDir := filepath.Join(curdir, "vendor")
-	err = export(dirtyVendorSrcDir, cleanVendorDir)
+	cleanVendorDir := filepath.Join(currentDir, "vendor")
+	err := export(dirtyVendorSrcDir, cleanVendorDir)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "export error:", err)
 	}
