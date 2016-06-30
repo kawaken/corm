@@ -177,6 +177,11 @@ func exportCmd() int {
 	return 0
 }
 
+func execCmd() int {
+	fakeGopath()
+	return 0
+}
+
 func usage() int {
 	fmt.Println(`Usage: corm command
 	install	:	install packages from Cormfile.
@@ -199,6 +204,8 @@ func main() {
 		os.Exit(mainCmd())
 	case "export":
 		os.Exit(exportCmd())
+	case "exec":
+		os.Exit(execCmd())
 	default:
 		os.Exit(usage())
 	}
