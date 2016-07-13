@@ -132,8 +132,10 @@ func init() {
 
 func fakeGopath() {
 
-	gopath := os.Getenv("GOPATH")
-	os.Setenv("GOPATH", fmt.Sprintf("%s:%s", dirtyVendorDir, gopath))
+	// if target package exists default GOPATH, then go get does nothing.
+	// So, set GOPATH dirtyVendorDir only
+
+	os.Setenv("GOPATH", dirtyVendorDir)
 
 }
 
