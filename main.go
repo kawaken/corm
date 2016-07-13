@@ -171,6 +171,12 @@ func mainCmd() int {
 
 func exportCmd() int {
 	dirtyVendorSrcDir := filepath.Join(dirtyVendorDir, "src")
+
+	if !exists(dirtyVendorDir) {
+		fmt.Fprintf(os.Stderr, "%s does not exists\n", dirtyVendorSrcDir)
+		return 1
+	}
+
 	cleanVendorDir := filepath.Join(currentDir, "vendor")
 	err := export(dirtyVendorSrcDir, cleanVendorDir)
 	if err != nil {
