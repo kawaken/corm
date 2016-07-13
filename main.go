@@ -31,6 +31,7 @@ type repository struct {
 }
 
 func parse(s string) (*repository, error) {
+	// TODO: Consider the format
 	fields := strings.Fields(s)
 	switch len(fields) {
 	case 1:
