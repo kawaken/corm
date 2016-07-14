@@ -190,8 +190,22 @@ func exportCmd() int {
 	return 0
 }
 
-func execCmd() int {
+func execCmd(args []string) int {
+	if len(args) == 0 {
+		fmt.Fprintln(os.Stderr, "no exec target command")
+		return 1
+	}
+
 	fakeGopath()
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdout = os.Stdout
+
+	// TODO: cant exec vim main.go
+	err := cmd.Run()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "exec error:", err)
+		return 1
+	}
 	return 0
 }
 
@@ -218,7 +232,7 @@ func main() {
 	case "export":
 		os.Exit(exportCmd())
 	case "exec":
-		os.Exit(execCmd())
+		os.Exit(execCmd(os.Args[2:]))
 	default:
 		os.Exit(usage())
 	}
