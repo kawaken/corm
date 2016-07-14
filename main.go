@@ -181,6 +181,7 @@ func exportCmd() int {
 	err := export(dirtyVendorSrcDir, cleanVendorDir)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "export error:", err)
+		return 1
 	}
 
 	return 0
