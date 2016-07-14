@@ -78,7 +78,9 @@ func readCorm(filepath string) ([]*repository, error) {
 func goGet(repo *repository) error {
 	// TODO: can handle options for `go get`
 	fmt.Printf("go get %s\n", repo.Path)
-	err := exec.Command("go", "get", repo.Path).Run()
+	cmd := exec.Command("go", "get", repo.Path)
+	cmd.Stdout = os.Stdout
+	err := cmd.Run()
 	// Commit が指定されている場合の処理は後で実装する
 	return err
 }
