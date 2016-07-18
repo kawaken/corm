@@ -206,13 +206,23 @@ func execCmd(args []string) int {
 	return 0
 }
 
-func buildCmd(args []string) int {
+func goSubCmd(sub string, args []string) error {
 	fakeGopath()
-	args = append([]string{"build"}, args...)
+	args = append([]string{sub}, args...)
 	cmd := exec.Command("go", args...)
 	err := cmd.Run()
+
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "build error:", err)
+		fmt.Fprintln(os.Stderr, sub, "error:", err)
+		return err
+	}
+
+	return nil
+}
+
+func buildCmd(args []string) int {
+	err := goSubCmd("build", args)
+	if err != nil {
 		return 1
 	}
 
