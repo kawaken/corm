@@ -229,6 +229,15 @@ func buildCmd(args []string) int {
 	return 0
 }
 
+func testCmd(args []string) int {
+	err := goSubCmd("test", args)
+	if err != nil {
+		return 1
+	}
+
+	return 0
+}
+
 func usage() int {
 	fmt.Println(`Usage: corm command
 	install	:	install packages from Cormfile.
@@ -261,6 +270,8 @@ func main() {
 		os.Exit(execCmd(os.Args[2:]))
 	case "build":
 		os.Exit(buildCmd(os.Args[2:]))
+	case "test":
+		os.Exit(testCmd(os.Args[2:]))
 	default:
 		os.Exit(usage())
 	}
