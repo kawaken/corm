@@ -19,6 +19,7 @@ const (
 var (
 	currentDir     string
 	dirtyVendorDir string
+	cormfile       string
 )
 
 var errCannotParseLine = errors.New("cannot parse line")
@@ -144,12 +145,6 @@ func fakeGopath() {
 }
 
 func mainCmd() int {
-	cormfile := filepath.Join(currentDir, cormFilename)
-	if !exists(cormfile) {
-		fmt.Fprintf(os.Stderr, "%s does not exists\n", cormfile)
-		return 1
-	}
-
 	repos, err := readCorm(cormfile)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -224,6 +219,12 @@ func main() {
 
 	if len(os.Args) == 1 {
 		os.Exit(usage())
+	}
+
+	cormfile = filepath.Join(currentDir, cormFilename)
+	if !exists(cormfile) {
+		fmt.Fprintf(os.Stderr, "%s does not exists\n", cormfile)
+		os.Exit(1)
 	}
 
 	command := os.Args[1]
