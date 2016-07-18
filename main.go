@@ -206,6 +206,19 @@ func execCmd(args []string) int {
 	return 0
 }
 
+func buildCmd(args []string) int {
+	fakeGopath()
+	args = append([]string{"build"}, args...)
+	cmd := exec.Command("go", args...)
+	err := cmd.Run()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "build error:", err)
+		return 1
+	}
+
+	return 0
+}
+
 func usage() int {
 	fmt.Println(`Usage: corm command
 	install	:	install packages from Cormfile.
@@ -236,6 +249,8 @@ func main() {
 		os.Exit(exportCmd())
 	case "exec":
 		os.Exit(execCmd(os.Args[2:]))
+	case "build":
+		os.Exit(buildCmd(os.Args[2:]))
 	default:
 		os.Exit(usage())
 	}
