@@ -241,7 +241,10 @@ func testCmd(args []string) int {
 func usage() int {
 	fmt.Println(`Usage: corm command
 	install	:	install packages from Cormfile.
-	export	:	export packages to vendor directory.`)
+	export	:	export packages to vendor directory.
+	exec    :   exec command with faked GOPATH.
+	build   :   build files with vendor libraries.
+	test    :   test files with vendor libraries.`)
 
 	return 1
 }
